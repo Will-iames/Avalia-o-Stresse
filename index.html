@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Avaliação de Estresse - Hospital Dom Joaquim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .whatsapp-bg {
+            background: #ECE5DD;
+            min-height: 100vh;
+        }
+        
+        .whatsapp-container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+        
+        .whatsapp-header {
+            background: #075E54;
+            color: white;
+            padding: 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .chat-bubble {
+            background: #DCF8C6;
+            border-radius: 18px 18px 4px 18px;
+            padding: 12px 16px;
+            margin: 8px 16px 8px 60px;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .chat-bubble-left {
+            background: white;
+            border-radius: 18px 18px 18px 4px;
+            margin: 8px 60px 8px 16px;
+        }
+        
+        .option-button {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 20px;
+            margin: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 44px;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .option-button:hover {
+            background: #128C7E;
+            transform: scale(1.02);
+        }
+        
+        .option-button.selected {
+            background: #075E54;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: #25D366;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .progress-container {
+            background: #f0f0f0;
+            height: 4px;
+            margin: 0 16px;
+        }
+        
+        .nav-button {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 50px;
+        }
+        
+        .nav-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .nav-button:hover:not(:disabled) {
+            background: #128C7E;
+            transform: translateY(-1px);
+        }
+        
+        .result-card {
+            margin: 16px;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .stress-low { background: linear-gradient(135deg, #4CAF50, #8BC34A); }
+        .stress-moderate { background: linear-gradient(135deg, #FF9800, #FFC107); }
+        .stress-high { background: linear-gradient(135deg, #FF5722, #F44336); }
+        .stress-severe { background: linear-gradient(135deg, #D32F2F, #B71C1C); }
+        
+        .info-card {
+            background: white;
+            margin: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .hospital-info {
+            background: #E3F2FD;
+            border-left: 4px solid #2196F3;
+            padding: 16px;
+            margin: 16px;
+            border-radius: 8px;
+        }
+        
+        .emergency-info {
+            background: #FFEBEE;
+            border-left: 4px solid #F44336;
+            padding: 16px;
+            margin: 16px;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 480px) {
+            .chat-bubble {
+                margin: 8px 12px 8px 40px;
+                padding: 10px 14px;
+            }
+            
+            .chat-bubble-left {
+                margin: 8px 40px 8px 12px;
+            }
+            
+            .option-button {
+                display: block;
+                width: calc(100% - 32px);
+                margin: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body class="whatsapp-bg">
+    <div class="whatsapp-container">
+        <!-- Header -->
+        <div class="whatsapp-header">
+            <div class="flex items-center justify-center space-x-3">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="font-bold text-lg">Hospital Dom Joaquim</div>
+                    <div class="text-sm opacity-90">Avaliação de Estresse</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div id="progress-section" class="hidden">
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <div class="text-center py-2 text-sm text-gray-600" id="progress-text">
+                Pergunta 1 de 21
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-area" class="pb-20">
+            <!-- Introdução -->
+            <div id="intro-section">
+                <div class="chat-bubble-left">
+                    <div class="font-semibold text-blue-600 mb-2">🏥 Hospital Dom Joaquim</div>
+                    <p class="mb-3">Olá! Bem-vindo(a) à nossa avaliação de estresse.</p>
+                    <p class="mb-3">Este questionário foi desenvolvido com base em escalas científicas validadas e pode ajudar a identificar se você precisa de apoio psicológico.</p>
+                    <p class="text-sm text-gray-600">⏱️ Tempo estimado: 3-5 minutos<br>
+                    🔒 Suas respostas são confidenciais</p>
+                </div>
+                
+                <div class="text-center py-4">
+                    <button id="start-btn" class="nav-button">
+                        Iniciar Avaliação ▶️
+                    </button>
+                </div>
+            </div>
+
+            <!-- Perguntas -->
+            <div id="questions-section" class="hidden">
+                <div class="chat-bubble-left">
+                    <div class="font-semibold text-blue-600 mb-2">Pergunta <span id="current-q">1</span>/21</div>
+                    <p id="question-text" class="mb-4"></p>
+                    <div class="text-xs text-gray-500">Escolha a opção que melhor descreve sua situação:</div>
+                </div>
+                
+                <div id="options-container" class="px-4 py-2">
+                    <!-- Opções serão inseridas aqui -->
+                </div>
+                
+                <div class="flex justify-between px-4 py-4">
+                    <button id="prev-btn" class="nav-button" style="background: #6c757d;" disabled>
+                        ◀️ Anterior
+                    </button>
+                    <button id="next-btn" class="nav-button" disabled>
+                        Próxima ▶️
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resultados -->
+            <div id="results-section" class="hidden">
+                <div class="chat-bubble-left">
+                    <div class="font-semibold text-blue-600 mb-2">✅ Avaliação Concluída</div>
+                    <p>Obrigado por completar nossa avaliação! Aqui está seu resultado:</p>
+                </div>
+
+                <div id="result-card" class="result-card">
+                    <div class="text-4xl mb-2" id="result-emoji">😌</div>
+                    <div class="text-xl font-bold mb-1" id="result-title">Resultado</div>
+                    <div class="text-lg" id="result-score">0/84 pontos</div>
+                    <div class="text-sm mt-2 opacity-90" id="result-category">Categoria</div>
+                </div>
+
+                <div class="info-card">
+                    <h4 class="font-bold text-gray-800 mb-3">📊 Interpretação</h4>
+                    <div id="interpretation-text" class="text-gray-700 space-y-2"></div>
+                </div>
+
+                <div class="info-card">
+                    <h4 class="font-bold text-gray-800 mb-3">💡 Recomendações</h4>
+                    <div id="recommendations-text" class="text-gray-700 space-y-2"></div>
+                </div>
+
+                <div class="hospital-info">
+                    <h4 class="font-bold text-blue-800 mb-2">🏥 Precisa de Ajuda?</h4>
+                    <div class="text-blue-700 text-sm space-y-1">
+                        <p><strong>Hospital Dom Joaquim - Brusque</strong></p>
+                        <p>📞 <a href="tel:4733511800" class="text-blue-600">(47) 3351-1800</a></p>
+                        <p>📍 Rua Azambuja, 80 - Centro, Brusque - SC</p>
+                        <p>🕒 Segunda a Sexta, 7h às 18h</p>
+                    </div>
+                </div>
+
+                <div class="emergency-info">
+                    <h4 class="font-bold text-red-800 mb-2">🚨 Emergência 24h</h4>
+                    <div class="text-red-700 text-sm">
+                        <p>CVV: <a href="tel:188" class="text-red-600 font-bold">188</a> | SAMU: <a href="tel:192" class="text-red-600 font-bold">192</a></p>
+                    </div>
+                </div>
+
+                <div class="text-center py-4 space-y-3">
+                    <button id="restart-btn" class="nav-button">
+                        🔄 Refazer Avaliação
+                    </button>
+                    <button id="share-btn" class="nav-button" style="background: #128C7E;">
+                        📤 Compartilhar no WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Perguntas simplificadas para WhatsApp
+        const questions = [
+            {
+                text: "No último mês, com que frequência você ficou aborrecido(a) por algo inesperado?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você se sentiu incapaz de controlar coisas importantes da sua vida?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você se sentiu nervoso(a) e estressado(a)?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você teve dificuldade para dormir?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você se sentiu sobrecarregado(a)?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você teve dores de cabeça ou tensão muscular?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você se sentiu irritado(a) sem motivo?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência teve dificuldade para se concentrar?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você se sentiu triste ou deprimido(a)?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você evitou situações sociais?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você se sentiu ansioso(a) sobre o futuro?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência teve alterações no apetite?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você se sentiu sem energia?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência teve pensamentos negativos sobre si?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência se sentiu incapaz de lidar com problemas?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência usou álcool ou medicamentos para se sentir melhor?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você se sentiu isolado(a) ou sozinho(a)?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência teve conflitos nos relacionamentos?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência você se sentiu pessimista?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência teve sintomas físicos sem causa médica (palpitações, sudorese)?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            },
+            {
+                text: "Com que frequência pensou em procurar ajuda profissional?",
+                options: ["Nunca", "Quase nunca", "Às vezes", "Frequentemente", "Muito frequente"]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answers = [];
+        let totalScore = 0;
+
+        // Elementos DOM
+        const introSection = document.getElementById('intro-section');
+        const questionsSection = document.getElementById('questions-section');
+        const resultsSection = document.getElementById('results-section');
+        const progressSection = document.getElementById('progress-section');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const startBtn = document.getElementById('start-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const shareBtn = document.getElementById('share-btn');
+
+        // Iniciar avaliação
+        startBtn.addEventListener('click', function() {
+            introSection.classList.add('hidden');
+            questionsSection.classList.remove('hidden');
+            progressSection.classList.remove('hidden');
+            showQuestion(0);
+        });
+
+        // Mostrar pergunta
+        function showQuestion(index) {
+            currentQuestion = index;
+            
+            document.getElementById('current-q').textContent = index + 1;
+            document.getElementById('question-text').textContent = questions[index].text;
+            
+            // Atualizar progresso
+            const progress = ((index + 1) / questions.length) * 100;
+            progressBar.style.width = progress + '%';
+            progressText.textContent = `Pergunta ${index + 1} de ${questions.length}`;
+            
+            // Criar opções
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            questions[index].options.forEach((option, optionIndex) => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => selectAnswer(optionIndex, button);
+                
+                if (answers[index] === optionIndex) {
+                    button.classList.add('selected');
+                }
+                
+                container.appendChild(button);
+            });
+            
+            // Atualizar botões de navegação
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = answers[index] === undefined;
+            nextBtn.textContent = index === questions.length - 1 ? 'Ver Resultado 🎯' : 'Próxima ▶️';
+            
+            // Scroll para o topo
+            window.scrollTo(0, 0);
+        }
+
+        // Selecionar resposta
+        function selectAnswer(optionIndex, selectedButton) {
+            answers[currentQuestion] = optionIndex;
+            
+            // Remover seleção anterior
+            document.querySelectorAll('.option-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Marcar nova seleção
+            selectedButton.classList.add('selected');
+            nextBtn.disabled = false;
+        }
+
+        // Navegação
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                showQuestion(currentQuestion - 1);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestion < questions.length - 1) {
+                showQuestion(currentQuestion + 1);
+            } else {
+                showResults();
+            }
+        });
+
+        // Mostrar resultados
+        function showResults() {
+            totalScore = answers.reduce((sum, answer) => sum + answer, 0);
+            
+            questionsSection.classList.add('hidden');
+            progressSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+            
+            let level, emoji, title, category, bgClass;
+            
+            if (totalScore <= 21) {
+                level = 'baixo';
+                emoji = '😌';
+                title = 'Estresse Baixo';
+                category = 'Bem-estar Emocional';
+                bgClass = 'stress-low';
+            } else if (totalScore <= 42) {
+                level = 'moderado';
+                emoji = '😐';
+                title = 'Estresse Moderado';
+                category = 'Atenção Recomendada';
+                bgClass = 'stress-moderate';
+            } else if (totalScore <= 63) {
+                level = 'alto';
+                emoji = '😰';
+                title = 'Estresse Alto';
+                category = 'Consulta Recomendada';
+                bgClass = 'stress-high';
+            } else {
+                level = 'severo';
+                emoji = '😵';
+                title = 'Estresse Severo';
+                category = 'Consulta Urgente';
+                bgClass = 'stress-severe';
+            }
+            
+            document.getElementById('result-card').className = `result-card ${bgClass}`;
+            document.getElementById('result-emoji').textContent = emoji;
+            document.getElementById('result-title').textContent = title;
+            document.getElementById('result-score').textContent = `${totalScore}/84 pontos`;
+            document.getElementById('result-category').textContent = category;
+            
+            // Interpretações
+            const interpretations = {
+                'baixo': ['Seus níveis de estresse estão saudáveis.', 'Continue com suas práticas de bem-estar.'],
+                'moderado': ['Você tem estresse moderado.', 'Considere técnicas de relaxamento.'],
+                'alto': ['Seus níveis de estresse estão elevados.', 'Recomendamos buscar apoio profissional.'],
+                'severo': ['Você tem estresse muito alto.', 'É importante procurar ajuda profissional imediatamente.']
+            };
+            
+            const recommendations = {
+                'baixo': ['Mantenha exercícios regulares', 'Cultive relacionamentos positivos'],
+                'moderado': ['Pratique meditação ou yoga', 'Organize melhor suas tarefas'],
+                'alto': ['Busque apoio psicológico', 'Priorize sono e alimentação'],
+                'severo': ['Procure ajuda profissional urgente', 'Conte com apoio familiar']
+            };
+            
+            document.getElementById('interpretation-text').innerHTML = 
+                interpretations[level].map(text => `<p>• ${text}</p>`).join('');
+            
+            document.getElementById('recommendations-text').innerHTML = 
+                recommendations[level].map(text => `<p>• ${text}</p>`).join('');
+            
+            window.scrollTo(0, 0);
+        }
+
+        // Reiniciar
+        restartBtn.addEventListener('click', () => {
+            currentQuestion = 0;
+            answers = [];
+            totalScore = 0;
+            
+            resultsSection.classList.add('hidden');
+            introSection.classList.remove('hidden');
+            progressSection.classList.add('hidden');
+            window.scrollTo(0, 0);
+        });
+
+        // Compartilhar no WhatsApp
+        shareBtn.addEventListener('click', () => {
+            const message = `🏥 *Hospital Dom Joaquim - Avaliação de Estresse*\n\nCompletei a avaliação e obtive ${totalScore}/84 pontos.\n\nEsta ferramenta pode ajudar a identificar quando buscar apoio psicológico.\n\n📞 Agendamento: (47) 3351-1800\n📍 Brusque - SC`;
+            
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'993d7cac26fe36f4',t:'MTc2MTM1MDk4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
